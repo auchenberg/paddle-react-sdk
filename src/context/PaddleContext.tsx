@@ -17,7 +17,11 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
   const [paddle, setPaddle] = useState<Paddle>();
 
   useEffect(() => {
+    let mounted = true;
+
     const initializePaddleSDK = async () => {
+      if (!mounted) return;
+      
       try {
         const { initializePaddle } = await import('@paddle/paddle-js');
         
@@ -26,58 +30,80 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
           environment: config.environment || (window.location.hostname === 'localhost' ? 'sandbox' : 'production')
         });
 
+        if (!mounted) return;
+
         if (!paddleInstance) {
           throw new Error('Failed to initialize Paddle');
         }
 
-        setPaddle(paddleInstance);
-        setIsInitialized(true);
+        // Batch state updates in React 18 style
+        React.startTransition(() => {
+          setPaddle(paddleInstance);
+          setIsInitialized(true);
+          setIsLoading(true);
+        });
         
         // Start loading product details
-        const enrichedProducts = await Promise.all(
+        const enrichedProducts = (await Promise.all(
           config.products.map(async (productId) => {
             try {
               const params: PricePreviewParams = {
                 items: [{ priceId: productId, quantity: 1 }]
               };
               
+              if (!mounted) return null;
+
               const preview = await paddleInstance.PricePreview(params);
               const details = Array.isArray(preview.data.details) ? preview.data.details : [];
               const firstDetail = details[0];
 
-              return {
+              if (!firstDetail) return null;
+
+              const product: EnrichedProduct = {
                 id: productId,
-                name: firstDetail?.product?.name || 'Unknown Product',
-                description: firstDetail?.product?.description,
+                name: firstDetail.product?.name || 'Unknown Product',
+                description: firstDetail.product?.description,
                 prices: [{
-                  id: firstDetail?.price?.id || '',
-                  amount: firstDetail?.price?.unitPrice || '0',
+                  id: firstDetail.price?.id || '',
+                  amount: firstDetail.price?.unitPrice?.toString() || '0',
                   currency: preview.data.currencyCode
                 }]
               };
+
+              return product;
             } catch (err) {
+              if (!mounted) return null;
               console.error(`Failed to load product ${productId}:`, err);
-              return {
+              const failedProduct: EnrichedProduct = {
                 id: productId,
                 name: 'Failed to load',
                 prices: []
               };
+              return failedProduct;
             }
           })
-        );
+        )).filter((p): p is EnrichedProduct => p !== null);
         
-        setProducts(enrichedProducts);
-        setIsLoading(false);
+        if (!mounted) return;
+        
+        // Batch state updates in React 18 style
+        React.startTransition(() => {
+          setProducts(enrichedProducts);
+          setIsLoading(false);
+        });
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to initialize Paddle'));
-        setIsLoading(false);
+        if (!mounted) return;
+        React.startTransition(() => {
+          setError(err instanceof Error ? err : new Error('Failed to initialize Paddle'));
+          setIsLoading(false);
+        });
       }
     };
 
     initializePaddleSDK();
 
     return () => {
-      // Cleanup if needed
+      mounted = false;
     };
   }, [config.clientToken, config.environment, config.products]);
 

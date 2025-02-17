@@ -6,14 +6,18 @@ export function useCheckout() {
   const { isInitialized, paddle } = usePaddleContext();
   const [isOpen, setIsOpen] = useState(false);
 
-  const openCheckout = useCallback((options: CheckoutOpenOptions) => {
+  const openCheckout = useCallback(async (options: CheckoutOpenOptions) => {
     if (!isInitialized || !paddle) {
       console.error('Paddle is not initialized');
       return;
     }
 
-    paddle.Checkout.open(options);
-    setIsOpen(true);
+    try {
+      await paddle.Checkout.open(options);
+      setIsOpen(true);
+    } catch (error) {
+      console.error('Failed to open checkout:', error);
+    }
   }, [isInitialized, paddle]);
 
   const closeCheckout = useCallback(() => {

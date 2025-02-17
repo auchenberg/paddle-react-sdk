@@ -20,13 +20,13 @@ export function PriceDisplay({ productId, showTax = false, showCurrency = true, 
   }
 
   return (
-    <span className={className}>
-      {price.formatted}
-      {showTax && price.market.tax_rate > 0 && (
-        <small className="text-gray-500 ml-1">
-          +{price.market.tax_rate}% tax
-        </small>
+    <div className={className}>
+      <span>{price.formatted}</span>
+      {showTax && price.tax && price.tax.rate > 0 && (
+        <span className="text-gray-500 ml-1" data-testid="tax-info">
+          +{price.tax.rate}% tax
+        </span>
       )}
-    </span>
+    </div>
   );
 }

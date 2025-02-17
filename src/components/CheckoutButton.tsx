@@ -26,9 +26,9 @@ export function CheckoutButton({
 }: CheckoutButtonProps) {
   const { openCheckout } = useCheckout();
 
-  const handleClick = () => {
+  const handleClick = async () => {
     onClick?.();
-    openCheckout({
+    await openCheckout({
       items,
       customData,
       settings: {
