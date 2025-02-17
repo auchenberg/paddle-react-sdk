@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { Paddle, PricePreviewParams, PricePreviewResponse } from '@paddle/paddle-js';
+import type { Paddle, PricePreviewParams } from '@paddle/paddle-js';
 import type { PaddleConfig, PaddleContextValue, EnrichedProduct } from '../types/paddle';
 
 const PaddleContext = createContext<PaddleContextValue | null>(null);

@@ -1,4 +1,4 @@
-import React from 'react';
+// Removed unused import
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { usePrice } from '../usePrice';
 import { createWrapper, setupPaddleMock, mockPricePreview } from '../../test/test-utils';

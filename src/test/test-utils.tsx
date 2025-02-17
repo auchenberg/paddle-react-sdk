@@ -13,7 +13,7 @@ export const mockPricePreview = {
   }
 };
 
-import type { Paddle } from '@paddle/paddle-js';
+// Removed unused import
 
 type MockPaddle = {
   Initialize: jest.Mock;

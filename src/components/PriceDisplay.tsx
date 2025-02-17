@@ -4,11 +4,10 @@ import { usePrice } from '../hooks/usePrice';
 export interface PriceDisplayProps {
   productId: string;
   showTax?: boolean;
-  showCurrency?: boolean;
   className?: string;
 }
 
-export function PriceDisplay({ productId, showTax = false, showCurrency = true, className = '' }: PriceDisplayProps) {
+export function PriceDisplay({ productId, showTax = false, className = '' }: PriceDisplayProps) {
   const { price, isLoading, error } = usePrice(productId);
 
   if (isLoading) {

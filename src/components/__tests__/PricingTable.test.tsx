@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { fireEvent, act } from '@testing-library/react';
 import { PricingTable } from '../PricingTable';
 import { renderWithPaddle, setupPaddleMock, mockPricePreview } from '../../test/test-utils';
 
