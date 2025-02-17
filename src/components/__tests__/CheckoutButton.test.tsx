@@ -4,8 +4,10 @@ import { CheckoutButton } from '../CheckoutButton';
 import { renderWithPaddle, setupPaddleMock } from '../../test/test-utils';
 
 describe('CheckoutButton', () => {
+  const mockPaddle = setupPaddleMock();
+  
   beforeEach(() => {
-    setupPaddleMock();
+    jest.resetAllMocks();
   });
 
   it('renders children correctly', async () => {
@@ -20,8 +22,6 @@ describe('CheckoutButton', () => {
   });
 
   it('opens checkout when clicked', async () => {
-    const mock = setupPaddleMock();
-    
     const { findByRole } = await renderWithPaddle(
       <CheckoutButton
         items={[{ priceId: 'pri_123', quantity: 1 }]}
@@ -37,19 +37,18 @@ describe('CheckoutButton', () => {
     // Click the button and wait for async operations
     await act(async () => {
       fireEvent.click(button);
-      // Wait for all promises to resolve
-      await Promise.resolve();
     });
 
-    await waitFor(() => {
-      expect(mock.Checkout.open).toHaveBeenCalledWith({
-        items: [{ priceId: 'pri_123', quantity: 1 }],
-        customData: undefined,
-        settings: {
-          theme: 'light',
-          displayMode: 'overlay'
-        }
-      });
+    // Wait for all microtasks to complete
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(mockPaddle.Checkout.open).toHaveBeenCalledWith({
+      items: [{ priceId: 'pri_123', quantity: 1 }],
+      customData: undefined,
+      settings: {
+        theme: 'light',
+        displayMode: 'overlay'
+      }
     });
   });
 
