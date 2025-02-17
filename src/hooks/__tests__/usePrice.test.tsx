@@ -1,12 +1,24 @@
 // Removed unused import
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { usePrice } from '../usePrice';
-import { createWrapper, setupPaddleMock, mockPricePreview } from '../../test/test-utils';
+import { createWrapper, setupPaddleMock } from '../../test/test-utils';
+
+// Use the actual PaddleProvider with our mock paddle instance
+const mockPaddle = setupPaddleMock();
 
 describe('usePrice', () => {
   beforeEach(() => {
-    const mock = setupPaddleMock();
-    mock.PricePreview.mockResolvedValue(mockPricePreview);
+    jest.resetAllMocks();
+    mockPaddle.PricePreview.mockResolvedValue({
+      data: {
+        details: [{
+          price: { unitPrice: 10 },
+          tax: { rate: 0, amount: '0' }
+        }],
+        currencyCode: 'USD',
+        address: { countryCode: 'US' }
+      }
+    });
   });
 
   it('returns loading state initially', async () => {
@@ -21,31 +33,41 @@ describe('usePrice', () => {
   });
 
   it('returns price details when loaded', async () => {
-    const { result } = renderHook(() => usePrice('pri_123'), {
+    const { result, unmount } = renderHook(() => usePrice('pri_123'), {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.price?.amount).toBe('10');
-    expect(result.current.price?.currency).toBe('USD');
+    try {
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+        expect(result.current.price?.amount).toBe('10');
+        expect(result.current.price?.currency).toBe('USD');
+      });
+    } finally {
+      unmount();
+    }
   });
 
   it('handles errors gracefully', async () => {
-    const mock = setupPaddleMock();
-    mock.PricePreview.mockRejectedValueOnce(new Error('API Error'));
+    mockPaddle.PricePreview.mockRejectedValueOnce(new Error('API Error'));
 
-    const { result } = renderHook(() => usePrice('pri_123'), {
+    const { result, unmount } = renderHook(() => usePrice('pri_123'), {
       wrapper: createWrapper(),
     });
 
-    // First wait for loading to complete
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    try {
+      // First verify loading state
+      expect(result.current.isLoading).toBe(true);
+      expect(result.current.price).toBe(null);
 
-    // Then verify error state
-    expect(result.current.error).toBeDefined();
-    expect(result.current.price).toBe(null);
+      // Then wait for error state
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+        expect(result.current.error).toBeDefined();
+        expect(result.current.price).toBe(null);
+      });
+    } finally {
+      unmount();
+    }
   });
 });
