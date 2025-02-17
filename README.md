@@ -1,50 +1,262 @@
-# React + TypeScript + Vite
+# Paddle React SDK
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, type-safe React SDK for integrating Paddle payments into your React applications.
 
-Currently, two official plugins are available:
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- 🚀 Modern React Hooks and Components
+- 📦 Built on official @paddle/paddle-js package
+- 🔒 Full TypeScript support
+- 🎨 Customizable UI components
+- 🏗️ Automatic sandbox detection for development
+- 🔄 Automatic product enrichment
+- 💳 Simple checkout integration
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Installation
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install @paddle/paddle-js @auchenberg/paddle-react
+# or
+yarn add @paddle/paddle-js @auchenberg/paddle-react
+# or
+pnpm add @paddle/paddle-js @auchenberg/paddle-react
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Quick Start
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Wrap your application with `PaddleProvider`:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```tsx
+import { PaddleProvider } from '@auchenberg/paddle-react';
+
+function App() {
+  return (
+    <PaddleProvider
+      config={{
+        clientToken: 'your_paddle_client_token',
+        products: ['pri_123'], // Your product IDs
+      }}
+    >
+      <YourApp />
+    </PaddleProvider>
+  );
+}
 ```
+
+### Display Product Prices
+
+```tsx
+import { PriceDisplay } from '@auchenberg/paddle-react';
+
+function ProductPrice() {
+  return (
+    <PriceDisplay
+      productId="pri_123"
+      showTax={true}
+      showCurrency={true}
+    />
+  );
+}
+```
+
+### Add Checkout Button
+
+```tsx
+import { CheckoutButton } from '@auchenberg/paddle-react';
+
+function BuyButton() {
+  return (
+    <CheckoutButton
+      items={[{ priceId: 'pri_123', quantity: 1 }]}
+      settings={{
+        theme: 'light',
+        displayMode: 'overlay',
+        successUrl: '/success'
+      }}
+    >
+      Subscribe Now
+    </CheckoutButton>
+  );
+}
+```
+
+### Create a Pricing Table
+
+```tsx
+import { PricingTable } from '@auchenberg/paddle-react';
+
+function Pricing() {
+  return (
+    <PricingTable
+      products={[
+        {
+          id: 'pri_123',
+          name: 'Basic',
+          description: 'Perfect for starters',
+          features: ['Feature 1', 'Feature 2'],
+          highlight: true
+        },
+        {
+          id: 'pri_456',
+          name: 'Pro',
+          description: 'For growing teams',
+          features: ['Feature 1', 'Feature 2', 'Feature 3'],
+        }
+      ]}
+      layout="horizontal"
+      theme={{
+        colorScheme: 'light',
+        accentColor: '#007bff'
+      }}
+    />
+  );
+}
+```
+
+### Use Hooks for Custom Integration
+
+#### Price Management
+```tsx
+import { usePrice } from '@auchenberg/paddle-react';
+
+function CustomPrice() {
+  const { price, isLoading, error, formatPrice } = usePrice('pri_123');
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading price</div>;
+
+  return (
+    <div>
+      <div>Price: {price?.formatted}</div>
+      <div>Custom format: {formatPrice(1000)}</div>
+    </div>
+  );
+}
+```
+
+#### Checkout Management
+```tsx
+import { useCheckout } from '@auchenberg/paddle-react';
+
+function CustomCheckout() {
+  const { openCheckout } = useCheckout();
+
+  const handlePurchase = () => {
+    openCheckout({
+      items: [{ priceId: 'pri_123', quantity: 1 }],
+      settings: {
+        theme: 'light',
+        displayMode: 'overlay'
+      }
+    });
+  };
+
+  return <button onClick={handlePurchase}>Buy Now</button>;
+}
+```
+
+## API Reference
+
+### PaddleProvider
+
+Configuration options:
+
+```typescript
+interface PaddleConfig {
+  clientToken: string;
+  environment?: 'sandbox' | 'production';
+  customerId?: string; // Your system's user ID
+  products: string[]; // Array of Paddle product IDs
+}
+```
+
+### Components
+
+#### PriceDisplay
+```typescript
+interface PriceDisplayProps {
+  productId: string;
+  showTax?: boolean;
+  showCurrency?: boolean;
+  className?: string;
+}
+```
+
+#### CheckoutButton
+```typescript
+interface CheckoutButtonProps {
+  items: Array<{ priceId: string; quantity: number }>;
+  settings?: {
+    theme?: 'light' | 'dark';
+    displayMode?: 'inline' | 'overlay';
+    frameTarget?: string;
+    successUrl?: string;
+  };
+  className?: string;
+  onClick?: () => void;
+}
+```
+
+#### PricingTable
+```typescript
+interface PricingTableProps {
+  products?: ProductOverride[];
+  layout?: 'horizontal' | 'vertical';
+  showComparison?: boolean;
+  theme?: {
+    colorScheme?: 'light' | 'dark';
+    accentColor?: string;
+    borderRadius?: string;
+  };
+  onPlanSelect?: (productId: string) => void;
+}
+```
+
+### Hooks
+
+#### usePrice
+```typescript
+function usePrice(productId: string): {
+  price: PriceDetails | null;
+  isLoading: boolean;
+  error?: Error;
+  formatPrice: (amount: number) => string;
+  calculateTax: (amount: number) => number;
+}
+```
+
+#### useCheckout
+```typescript
+function useCheckout(): {
+  openCheckout: (options: CheckoutOpenOptions) => void;
+  closeCheckout: () => void;
+  isOpen: boolean;
+}
+```
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run TypeScript type checking
+npm run typecheck
+
+# Run ESLint
+npm run lint
+
+# Build package
+npm run build
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT © [auchenberg]
