@@ -169,7 +169,7 @@ interface PaddleConfig {
   clientToken: string;
   environment?: 'sandbox' | 'production';
   customerId?: string; // Your system's user ID
-  products: string[]; // Array of Paddle product IDs
+  products: string[]; // Array of Paddle product IDs to preload
 }
 ```
 
