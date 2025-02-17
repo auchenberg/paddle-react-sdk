@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCheckout } from '../hooks/useCheckout';
-import type { CheckoutOpenOptions } from '@paddle/paddle-js';
+// Removed unused import
 
 export interface CheckoutButtonProps {
   items: Array<{ priceId: string; quantity: number }>;
@@ -26,9 +26,9 @@ export function CheckoutButton({
 }: CheckoutButtonProps) {
   const { openCheckout } = useCheckout();
 
-  const handleClick = () => {
+  const handleClick = async () => {
     onClick?.();
-    openCheckout({
+    await openCheckout({
       items,
       customData,
       settings: {

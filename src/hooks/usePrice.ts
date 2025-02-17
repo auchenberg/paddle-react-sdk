@@ -13,9 +13,12 @@ interface PriceDetails {
     type: 'day' | 'month';
     count: number;
   };
+  tax?: {
+    rate: number;
+    amount?: string;
+  };
   market: {
     country: string;
-    tax_rate: number;
   };
 }
 
@@ -23,7 +26,7 @@ export function usePrice(productId: string) {
   const { paddle, isInitialized } = usePaddleContext();
   const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const loadPriceDetails = async () => {
@@ -36,29 +39,37 @@ export function usePrice(productId: string) {
 
         const previewDetails = Array.isArray(preview.data.details) ? preview.data.details : [];
         const firstDetail = previewDetails[0];
+        
+        if (!firstDetail) throw new Error('No price details available');
+
         const priceDetails: PriceDetails = {
           formatted: new Intl.NumberFormat(navigator.language, {
             style: 'currency',
             currency: preview.data.currencyCode
-          }).format(firstDetail?.price?.unitPrice || 0),
-          amount: firstDetail?.price?.unitPrice?.toString() || '0',
+          }).format(firstDetail.price?.unitPrice || 0),
+          amount: firstDetail.price?.unitPrice?.toString() || '0',
           currency: preview.data.currencyCode,
+          tax: firstDetail.tax ? {
+            rate: firstDetail.tax.rate,
+            amount: firstDetail.tax.amount?.toString()
+          } : undefined,
           market: {
-            country: preview.data.address?.countryCode || 'US',
-            tax_rate: 0 // Tax rate is not directly available in preview response
+            country: preview.data.address?.countryCode || 'US'
           }
         };
 
         setPriceDetails(priceDetails);
+        setError(null);
         setIsLoading(false);
       } catch (err) {
+        setPriceDetails(null);
         setError(err instanceof Error ? err : new Error('Failed to load price details'));
         setIsLoading(false);
       }
     };
 
     loadPriceDetails();
-  }, [productId, isInitialized]);
+  }, [productId, isInitialized, paddle]);
 
   return {
     price: priceDetails,
@@ -70,10 +81,6 @@ export function usePrice(productId: string) {
         style: 'currency',
         currency: priceDetails.currency
       }).format(amount);
-    },
-    calculateTax: (amount: number) => {
-      if (!priceDetails?.market.tax_rate) return 0;
-      return amount * (priceDetails.market.tax_rate / 100);
     }
   };
 }
