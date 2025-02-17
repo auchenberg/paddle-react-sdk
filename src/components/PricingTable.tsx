@@ -3,13 +3,13 @@ import { usePaddleContext } from '../context/PaddleContext';
 import { PriceDisplay } from './PriceDisplay';
 import { CheckoutButton } from './CheckoutButton';
 
-import type { EnrichedProduct, ProductOverride } from '../types/paddle';
+import type { EnrichedPrice, PriceOverride } from '../types/paddle';
 
 export interface PricingTableProps {
-  products?: ProductOverride[];
+  prices?: PriceOverride[];
   layout?: 'horizontal' | 'vertical';
   showComparison?: boolean;
-  onPlanSelect?: (productId: string) => void;
+  onPlanSelect?: (priceId: string) => void;
   className?: string;
   theme?: {
     colorScheme?: 'light' | 'dark';
@@ -19,15 +19,15 @@ export interface PricingTableProps {
 }
 
 export function PricingTable({
-  products: overrideProducts,
+  prices: overridePrices,
   layout = 'horizontal',
   showComparison = false,
   onPlanSelect,
   className = '',
   theme
 }: PricingTableProps) {
-  const { products: contextProducts } = usePaddleContext();
-  const products = overrideProducts || contextProducts;
+  const { prices: contextPrices } = usePaddleContext();
+  const prices = overridePrices || contextPrices;
 
   const containerClass = `grid ${
     layout === 'horizontal' 
@@ -37,31 +37,31 @@ export function PricingTable({
 
   return (
     <div className={containerClass}>
-      {products.map((product) => (
+      {prices.map((price: PriceOverride) => (
         <div
-          key={product.id}
+          key={price.id}
           className={`rounded-lg border p-6 ${
-            product.highlight 
+            price.highlight 
               ? 'border-primary shadow-lg' 
               : 'border-border'
           }`}
         >
-          <h3 className="text-lg font-semibold">{product.name}</h3>
-          {product.description && (
+          <h3 className="text-lg font-semibold">{price.name}</h3>
+          {price.description && (
             <p className="mt-2 text-sm text-muted-foreground">
-              {product.description}
+              {price.description}
             </p>
           )}
           <div className="mt-4">
             <PriceDisplay 
-              productId={product.id || ''}
+              priceId={price.id || ''}
               showTax
               className="text-2xl font-bold"
             />
           </div>
-          {product.features && (
+          {price.features && (
             <ul className="mt-4 space-y-2">
-              {product.features.map((feature: string, index: number) => (
+              {price.features.map((feature: string, index: number) => (
                 <li key={index} className="flex items-center text-sm">
                   <svg
                     className="mr-2 h-4 w-4 text-primary"
@@ -83,12 +83,12 @@ export function PricingTable({
           )}
           <div className="mt-6">
             <CheckoutButton
-              items={[{ priceId: product.id || '', quantity: 1 }]}
+              items={[{ priceId: price.id || '', quantity: 1 }]}
               settings={{ theme: theme?.colorScheme }}
               className="w-full"
-              onClick={() => product.id && onPlanSelect?.(product.id)}
+              onClick={() => price.id && onPlanSelect?.(price.id)}
             >
-              {product.cta || 'Choose Plan'}
+              {price.cta || 'Choose Plan'}
             </CheckoutButton>
           </div>
         </div>

@@ -83,7 +83,7 @@ const createPaddleMock = (): MockPaddle => {
 export const createWrapper = () => {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <PaddleProvider config={{ clientToken: 'test_token', products: ['pri_123'] }}>
+      <PaddleProvider config={{ clientToken: 'test_token', priceIds: ['pri_123'] }}>
         {children}
       </PaddleProvider>
     );
@@ -106,7 +106,7 @@ export function renderWithPaddle(
 ): RenderResult {
   const defaultConfig: PaddleConfig = {
     clientToken: 'test_token',
-    products: ['pri_123'],
+    priceIds: ['pri_123'],
     ...options.paddleConfig
   };
 

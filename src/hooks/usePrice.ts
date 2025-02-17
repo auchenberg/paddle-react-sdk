@@ -22,7 +22,7 @@ interface PriceDetails {
   };
 }
 
-export function usePrice(productId: string) {
+export function usePrice(priceId: string) {
   const { paddle, isInitialized } = usePaddleContext();
   const [priceDetails, setPriceDetails] = useState<PriceDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +34,7 @@ export function usePrice(productId: string) {
 
       try {
         const preview = await paddle.PricePreview({
-          items: [{ priceId: productId, quantity: 1 }]
+          items: [{ priceId, quantity: 1 }]
         });
 
         const previewDetails = Array.isArray(preview.data.details) ? preview.data.details : [];
@@ -69,7 +69,7 @@ export function usePrice(productId: string) {
     };
 
     loadPriceDetails();
-  }, [productId, isInitialized, paddle]);
+  }, [priceId, isInitialized, paddle]);
 
   return {
     price: priceDetails,

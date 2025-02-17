@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Paddle, PricePreviewParams } from '@paddle/paddle-js';
-import type { PaddleConfig, PaddleContextValue, EnrichedProduct } from '../types/paddle';
+import type { PaddleConfig, PaddleContextValue, EnrichedPrice } from '../types/paddle';
 
 const PaddleContext = createContext<PaddleContextValue | null>(null);
 
@@ -13,7 +13,7 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error>();
-  const [products, setProducts] = useState<EnrichedProduct[]>([]);
+  const [prices, setPrices] = useState<EnrichedPrice[]>([]);
   const [paddle, setPaddle] = useState<Paddle>();
 
   useEffect(() => {
@@ -43,12 +43,12 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
           setIsLoading(true);
         });
         
-        // Start loading product details
-        const enrichedProducts = (await Promise.all(
-          config.products.map(async (productId) => {
+        // Start loading price details
+        const enrichedPrices = (await Promise.all(
+          config.priceIds.map(async (priceId) => {
             try {
               const params: PricePreviewParams = {
-                items: [{ priceId: productId, quantity: 1 }]
+                items: [{ priceId, quantity: 1 }]
               };
               
               if (!mounted) return null;
@@ -59,9 +59,9 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
 
               if (!firstDetail) return null;
 
-              const product: EnrichedProduct = {
-                id: productId,
-                name: firstDetail.product?.name || 'Unknown Product',
+              const price: EnrichedPrice = {
+                id: priceId,
+                name: firstDetail.product?.name || 'Unknown Price',
                 description: firstDetail.product?.description,
                 prices: [{
                   id: firstDetail.price?.id || '',
@@ -70,25 +70,25 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
                 }]
               };
 
-              return product;
+              return price;
             } catch (err) {
               if (!mounted) return null;
-              console.error(`Failed to load product ${productId}:`, err);
-              const failedProduct: EnrichedProduct = {
-                id: productId,
+              console.error(`Failed to load price ${priceId}:`, err);
+              const failedPrice: EnrichedPrice = {
+                id: priceId,
                 name: 'Failed to load',
                 prices: []
               };
-              return failedProduct;
+              return failedPrice;
             }
           })
-        )).filter((p): p is EnrichedProduct => p !== null);
+        )).filter((p): p is EnrichedPrice => p !== null);
         
         if (!mounted) return;
         
         // Batch state updates in React 18 style
         React.startTransition(() => {
-          setProducts(enrichedProducts);
+          setPrices(enrichedPrices);
           setIsLoading(false);
         });
       } catch (err) {
@@ -105,11 +105,11 @@ export function PaddleProvider({ config, children }: PaddleProviderProps) {
     return () => {
       mounted = false;
     };
-  }, [config.clientToken, config.environment, config.products]);
+  }, [config.clientToken, config.environment, config.priceIds]);
 
   const contextValue: PaddleContextValue = {
     config,
-    products,
+    prices,
     isInitialized,
     isLoading,
     error,

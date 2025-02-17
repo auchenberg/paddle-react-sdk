@@ -12,7 +12,7 @@ A modern, type-safe React SDK for integrating Paddle payments into your React ap
 - 🔒 Full TypeScript support
 - 🎨 Customizable UI components
 - 🏗️ Automatic sandbox detection for development
-- 🔄 Automatic product enrichment
+- 🔄 Automatic price enrichment
 - 💳 Simple checkout integration
 
 ## Installation
@@ -37,7 +37,7 @@ function App() {
     <PaddleProvider
       config={{
         clientToken: 'your_paddle_client_token',
-        products: ['pri_123'], // Your product IDs
+        priceIds: ['pri_123'], // Your price IDs
       }}
     >
       <YourApp />
@@ -46,15 +46,15 @@ function App() {
 }
 ```
 
-### Display Product Prices
+### Display Prices
 
 ```tsx
 import { PriceDisplay } from '@auchenberg/paddle-react';
 
-function ProductPrice() {
+function PriceDisplay() {
   return (
     <PriceDisplay
-      productId="pri_123"
+      priceId="pri_123"
       showTax={true}
       showCurrency={true}
     />
@@ -91,7 +91,7 @@ import { PricingTable } from '@auchenberg/paddle-react';
 function Pricing() {
   return (
     <PricingTable
-      products={[
+      prices={[
         {
           id: 'pri_123',
           name: 'Basic',
@@ -169,7 +169,7 @@ interface PaddleConfig {
   clientToken: string;
   environment?: 'sandbox' | 'production';
   customerId?: string; // Your system's user ID
-  products: string[]; // Array of Paddle product IDs
+  priceIds: string[]; // Array of Paddle price IDs
 }
 ```
 
@@ -178,7 +178,7 @@ interface PaddleConfig {
 #### PriceDisplay
 ```typescript
 interface PriceDisplayProps {
-  productId: string;
+  priceId: string;
   showTax?: boolean;
   showCurrency?: boolean;
   className?: string;
@@ -203,7 +203,7 @@ interface CheckoutButtonProps {
 #### PricingTable
 ```typescript
 interface PricingTableProps {
-  products?: ProductOverride[];
+  prices?: PriceOverride[];
   layout?: 'horizontal' | 'vertical';
   showComparison?: boolean;
   theme?: {
@@ -211,7 +211,7 @@ interface PricingTableProps {
     accentColor?: string;
     borderRadius?: string;
   };
-  onPlanSelect?: (productId: string) => void;
+  onPlanSelect?: (priceId: string) => void;
 }
 ```
 
@@ -219,7 +219,7 @@ interface PricingTableProps {
 
 #### usePrice
 ```typescript
-function usePrice(productId: string): {
+function usePrice(priceId: string): {
   price: PriceDetails | null;
   isLoading: boolean;
   error?: Error;

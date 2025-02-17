@@ -14,10 +14,10 @@ export interface PaddleConfig {
   environment?: 'sandbox' | 'production';
   // Your application's customer ID (e.g., Supabase user ID)
   customerId?: string;
-  products: string[];
+  priceIds: string[]; // Changed from products for accuracy - price IDs are used for pricing
 }
 
-export interface ProductPrice {
+export interface PriceDetails {
   id: string;
   amount: string;
   currency: string;
@@ -31,22 +31,22 @@ export interface ProductPrice {
   };
 }
 
-export interface EnrichedProduct {
+export interface EnrichedPrice {
   id: string;
   name: string;
   description?: string;
-  prices: ProductPrice[];
+  prices: PriceDetails[];
   features?: string[];
   highlight?: boolean;
   cta?: string;
 }
 
-// Helper type for product overrides in PricingTable
-export type ProductOverride = Partial<Omit<EnrichedProduct, 'prices'>> & { id: string };
+// Helper type for price overrides in PricingTable
+export type PriceOverride = Partial<Omit<EnrichedPrice, 'prices'>> & { id: string };
 
 export interface PaddleContextValue {
   config: PaddleConfig;
-  products: EnrichedProduct[];
+  prices: EnrichedPrice[]; // Changed from products to prices to reflect that these are price-based products
   isInitialized: boolean;
   isLoading: boolean;
   error?: Error;
@@ -63,3 +63,9 @@ export type {
   Theme,
   DisplayMode
 };
+
+// Re-export renamed types for backward compatibility
+/** @deprecated Use PriceDetails instead */
+export type ProductPrice = PriceDetails;
+/** @deprecated Use EnrichedPrice instead */
+export type EnrichedProduct = EnrichedPrice;

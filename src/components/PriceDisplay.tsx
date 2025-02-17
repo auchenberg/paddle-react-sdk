@@ -2,13 +2,13 @@ import React from 'react';
 import { usePrice } from '../hooks/usePrice';
 
 export interface PriceDisplayProps {
-  productId: string;
+  priceId: string;
   showTax?: boolean;
   className?: string;
 }
 
-export function PriceDisplay({ productId, showTax = false, className = '' }: PriceDisplayProps) {
-  const { price, isLoading, error } = usePrice(productId);
+export function PriceDisplay({ priceId, showTax = false, className = '' }: PriceDisplayProps) {
+  const { price, isLoading, error } = usePrice(priceId);
 
   if (isLoading) {
     return <span className={className}>Loading...</span>;

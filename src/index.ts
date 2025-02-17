@@ -14,8 +14,8 @@ export { useCheckout } from './hooks/useCheckout';
 // Types
 export type {
   PaddleConfig,
-  EnrichedProduct,
+  EnrichedPrice,
   CheckoutOpenOptions,
   PaddleContextValue,
-  ProductOverride
+  PriceOverride
 } from './types/paddle';

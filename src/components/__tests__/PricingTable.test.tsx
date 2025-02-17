@@ -3,7 +3,7 @@ import { fireEvent, act } from '@testing-library/react';
 import { PricingTable } from '../PricingTable';
 import { renderWithPaddle, setupPaddleMock, mockPricePreview } from '../../test/test-utils';
 
-const mockProducts = [
+const mockPrices = [
   {
     id: 'pri_123',
     name: 'Basic',
@@ -25,8 +25,8 @@ describe('PricingTable', () => {
     mock.PricePreview.mockResolvedValue(mockPricePreview);
   });
 
-  it('renders all products', async () => {
-    const { findByRole, findByText } = await renderWithPaddle(<PricingTable products={mockProducts} />);
+  it('renders all prices', async () => {
+    const { findByRole, findByText } = await renderWithPaddle(<PricingTable prices={mockPrices} />);
     
     const basicHeading = await findByRole('heading', { name: 'Basic' });
     const proHeading = await findByRole('heading', { name: 'Pro' });
@@ -39,22 +39,22 @@ describe('PricingTable', () => {
     expect(teamsText).toBeInTheDocument();
   });
 
-  it('renders features for each product', async () => {
-    const { findAllByText } = await renderWithPaddle(<PricingTable products={mockProducts} />);
+  it('renders features for each price', async () => {
+    const { findAllByText } = await renderWithPaddle(<PricingTable prices={mockPrices} />);
     
-    for (const feature of mockProducts[0].features) {
+    for (const feature of mockPrices[0].features) {
       const elements = await findAllByText(feature);
       expect(elements.length).toBeGreaterThan(0);
     }
     
-    for (const feature of mockProducts[1].features) {
+    for (const feature of mockPrices[1].features) {
       const elements = await findAllByText(feature);
       expect(elements.length).toBeGreaterThan(0);
     }
   });
 
-  it('applies highlight styling to featured products', async () => {
-    const { findByRole } = await renderWithPaddle(<PricingTable products={mockProducts} />);
+  it('applies highlight styling to featured prices', async () => {
+    const { findByRole } = await renderWithPaddle(<PricingTable prices={mockPrices} />);
     
     const basicHeading = await findByRole('heading', { name: 'Basic' });
     const basicPlan = basicHeading.closest('div');
@@ -66,7 +66,7 @@ describe('PricingTable', () => {
     
     const { findAllByRole } = await renderWithPaddle(
       <PricingTable
-        products={mockProducts}
+        prices={mockPrices}
         onPlanSelect={onPlanSelect}
       />
     );
@@ -83,7 +83,7 @@ describe('PricingTable', () => {
   it('renders with custom theme settings', async () => {
     const { findByRole } = await renderWithPaddle(
       <PricingTable
-        products={mockProducts}
+        prices={mockPrices}
         theme={{
           colorScheme: 'dark',
           accentColor: '#ff0000',

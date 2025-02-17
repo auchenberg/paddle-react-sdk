@@ -9,12 +9,12 @@ describe('PriceDisplay', () => {
   });
 
   it('renders loading state initially', () => {
-    renderWithPaddle(<PriceDisplay productId="pri_123" />);
+    renderWithPaddle(<PriceDisplay priceId="pri_123" />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('displays formatted price', () => {
-    renderWithPaddle(<PriceDisplay productId="pri_123" />);
+    renderWithPaddle(<PriceDisplay priceId="pri_123" />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 });
