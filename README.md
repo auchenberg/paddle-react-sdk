@@ -18,11 +18,11 @@ A modern, type-safe React SDK for integrating Paddle payments into your React ap
 ## Installation
 
 ```bash
-npm install @paddle/paddle-js @auchenberg/paddle-react
+npm install @paddle/paddle-js @mortenjust/paddle-react
 # or
-yarn add @paddle/paddle-js @auchenberg/paddle-react
+yarn add @paddle/paddle-js @mortenjust/paddle-react
 # or
-pnpm add @paddle/paddle-js @auchenberg/paddle-react
+pnpm add @paddle/paddle-js @mortenjust/paddle-react
 ```
 
 ## Quick Start
@@ -30,7 +30,7 @@ pnpm add @paddle/paddle-js @auchenberg/paddle-react
 Wrap your application with `PaddleProvider`:
 
 ```tsx
-import { PaddleProvider } from '@auchenberg/paddle-react';
+import { PaddleProvider } from '@mortenjust/paddle-react';
 
 function App() {
   return (
@@ -49,7 +49,7 @@ function App() {
 ### Display Product Prices
 
 ```tsx
-import { PriceDisplay } from '@auchenberg/paddle-react';
+import { PriceDisplay } from '@mortenjust/paddle-react';
 
 function ProductPrice() {
   return (
@@ -65,7 +65,7 @@ function ProductPrice() {
 ### Add Checkout Button
 
 ```tsx
-import { CheckoutButton } from '@auchenberg/paddle-react';
+import { CheckoutButton } from '@mortenjust/paddle-react';
 
 function BuyButton() {
   return (
@@ -86,7 +86,7 @@ function BuyButton() {
 ### Create a Pricing Table
 
 ```tsx
-import { PricingTable } from '@auchenberg/paddle-react';
+import { PricingTable } from '@mortenjust/paddle-react';
 
 function Pricing() {
   return (
@@ -120,7 +120,7 @@ function Pricing() {
 
 #### Price Management
 ```tsx
-import { usePrice } from '@auchenberg/paddle-react';
+import { usePrice } from '@mortenjust/paddle-react';
 
 function CustomPrice() {
   const { price, isLoading, error, formatPrice } = usePrice('pri_123');
@@ -139,7 +139,7 @@ function CustomPrice() {
 
 #### Checkout Management
 ```tsx
-import { useCheckout } from '@auchenberg/paddle-react';
+import { useCheckout } from '@mortenjust/paddle-react';
 
 function CustomCheckout() {
   const { openCheckout } = useCheckout();
