@@ -1,5 +1,5 @@
 {
-  "name": "@your-org/paddle-react",
+  "name": "@mortenjust/paddle-react",
   "type": "module",
   "version": "0.1.0",
   "description": "React SDK for Paddle Payments",
